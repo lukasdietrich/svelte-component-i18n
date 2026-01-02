@@ -1,3 +1,27 @@
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+  import { Translator } from '../lib/index.ts';
+
+  const translator = new Translator(['en', 'de'], 'en');
+  const { currentLanguage } = translator;
+
+  const { t } = translator.define({
+    text: {
+      en: {
+        one: 'Test En',
+      },
+      de: {
+        one: 'Test De',
+      },
+    },
+  });
+</script>
+
+<select bind:value={$currentLanguage}>
+  {#each translator.languages as language (language)}
+    <option value={language}>{language}</option>
+  {/each}
+</select>
+
+<p>
+  {$t('text')}
+</p>
