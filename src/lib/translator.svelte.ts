@@ -1,12 +1,14 @@
 import type { Locale } from './locale.ts';
 import { Dictionary, type Texts } from './dictionary.ts';
 
+type MustStringUnion<T extends string> = string extends T ? never : T;
+
 export class Translator<Languages extends string, Fallback extends Languages> {
   currentLanguage: Languages;
   private readonly locale: Locale<Languages, Fallback>;
 
   constructor(
-    public readonly languages: Languages[],
+    public readonly languages: MustStringUnion<Languages>[],
     public readonly fallback: Fallback
   ) {
     checkSupportedLanguages(languages);
