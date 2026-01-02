@@ -3,7 +3,7 @@
 
   const translator = new Translator(['en', 'de'], 'en');
 
-  const { t } = translator.define({
+  const { t, p } = translator.define({
     simple: {
       en: 'Simple',
       de: 'Einfach',
@@ -19,6 +19,11 @@
         other: 'Viele Dinge',
       },
     },
+
+    parameterized: (name: string) => ({
+      en: `Hello ${name}`,
+      de: `Hallo ${name}`,
+    }),
   });
 </script>
 
@@ -42,11 +47,15 @@
     </tr>
     <tr>
       <td>Pluralized - One</td>
-      <td>{t('thing')}</td>
+      <td>{p('thing', 1)}</td>
     </tr>
     <tr>
       <td>Pluralized - Many</td>
-      <td>{t('thing', 42)}</td>
+      <td>{p('thing', 42)}</td>
+    </tr>
+    <tr>
+      <td>Parameterized</td>
+      <td>{t('parameterized', 'Svelte')}</td>
     </tr>
   </tbody>
 </table>

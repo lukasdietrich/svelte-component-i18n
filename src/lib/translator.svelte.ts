@@ -1,6 +1,5 @@
-import type { Texts } from './declaration.ts';
-import { Dictionary } from './dictionary.ts';
 import type { Locale } from './locale.ts';
+import { Dictionary, type Texts } from './dictionary.ts';
 
 export class Translator<Languages extends string, Fallback extends Languages> {
   currentLanguage: Languages;
