@@ -1,2 +1,2 @@
-export { Translator } from './translator.ts';
+export { Translator } from './translator.svelte.ts';
 export { type Dictionary } from './dictionary.ts';

@@ -1,9 +1,10 @@
-import { writable, type Writable } from 'svelte/store';
 import type { Texts } from './declaration.ts';
 import { Dictionary } from './dictionary.ts';
+import type { Locale } from './locale.ts';
 
 export class Translator<Languages extends string, Fallback extends Languages> {
-  readonly currentLanguage: Writable<Languages>;
+  currentLanguage: Languages;
+  private readonly locale: Locale<Languages, Fallback>;
 
   constructor(
     public readonly languages: Languages[],
@@ -11,11 +12,17 @@ export class Translator<Languages extends string, Fallback extends Languages> {
   ) {
     checkSupportedLanguages(languages);
 
-    this.currentLanguage = writable(fallback);
+    this.currentLanguage = $state(fallback);
+
+    this.locale = $derived({
+      language: this.currentLanguage,
+      fallback: this.fallback,
+      pluralRules: new Intl.PluralRules(this.currentLanguage),
+    });
   }
 
   define<T>(texts: Texts<Languages, Fallback, T>): Dictionary<Languages, Fallback, T> {
-    return new Dictionary(this.currentLanguage, this.fallback, texts);
+    return new Dictionary(() => this.locale, texts);
   }
 }
 

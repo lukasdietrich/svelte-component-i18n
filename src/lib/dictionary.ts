@@ -1,32 +1,27 @@
-import { derived, type Readable } from 'svelte/store';
 import type { Texts } from './declaration.ts';
+import type { Locale } from './locale.ts';
 
 export class Dictionary<Languages extends string, Fallback extends Languages, T> {
-  readonly t: Readable<ReturnType<typeof this.makeTranslateFn>>;
-
   constructor(
-    language: Readable<Languages>,
-    private readonly fallback: Fallback,
+    private readonly locale: () => Locale<Languages, Fallback>,
     private readonly texts: Texts<Languages, Fallback, T>
-  ) {
-    this.t = derived(language, this.makeTranslateFn);
-  }
+  ) {}
 
-  private readonly makeTranslateFn = (language: Languages) => {
-    return (key: keyof T, n: number = 1): string => {
-      const localized = this.texts[key];
-      const pluralized = language in localized ? localized[language] : localized[this.fallback];
+  readonly translate = (key: keyof T, n: number = 1): string => {
+    const { language, fallback, pluralRules } = this.locale();
 
-      const rules = new Intl.PluralRules(language);
-      const quantifier = rules.select(n);
+    const localized = this.texts[key];
+    const pluralized = language in localized ? localized[language] : localized[fallback];
 
-      if (has(pluralized, quantifier)) {
-        return pluralized[quantifier];
-      }
+    const quantifier = pluralRules.select(n);
+    if (has(pluralized, quantifier)) {
+      return pluralized[quantifier];
+    }
 
-      return pluralized.one;
-    };
+    return pluralized.one;
   };
+
+  readonly t = this.translate;
 }
 
 function has<T extends {}, K extends keyof T>(

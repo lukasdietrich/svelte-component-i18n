@@ -2,7 +2,6 @@
   import { Translator } from '../lib/index.ts';
 
   const translator = new Translator(['en', 'de'], 'en');
-  const { currentLanguage } = translator;
 
   const { t } = translator.define({
     text: {
@@ -16,12 +15,12 @@
   });
 </script>
 
-<select bind:value={$currentLanguage}>
+<select bind:value={translator.currentLanguage}>
   {#each translator.languages as language (language)}
     <option value={language}>{language}</option>
   {/each}
 </select>
 
 <p>
-  {$t('text')}
+  {t('text')}
 </p>
