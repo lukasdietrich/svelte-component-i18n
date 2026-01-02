@@ -4,12 +4,19 @@
   const translator = new Translator(['en', 'de'], 'en');
 
   const { t } = translator.define({
-    text: {
+    simple: {
+      en: 'Simple',
+      de: 'Einfach',
+    },
+
+    thing: {
       en: {
-        one: 'Test En',
+        one: 'One thing',
+        other: 'Many things',
       },
       de: {
-        one: 'Test De',
+        one: 'Ein Ding',
+        other: 'Viele Dinge',
       },
     },
   });
@@ -21,6 +28,36 @@
   {/each}
 </select>
 
-<p>
-  {t('text')}
-</p>
+<table>
+  <thead>
+    <tr>
+      <th>Example</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Simple</td>
+      <td>{t('simple')}</td>
+    </tr>
+    <tr>
+      <td>Pluralized - One</td>
+      <td>{t('thing')}</td>
+    </tr>
+    <tr>
+      <td>Pluralized - Many</td>
+      <td>{t('thing', 42)}</td>
+    </tr>
+  </tbody>
+</table>
+
+<style>
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    border: 1px solid black;
+  }
+</style>

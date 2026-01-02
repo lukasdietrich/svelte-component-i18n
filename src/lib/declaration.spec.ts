@@ -23,6 +23,9 @@ describe('declaration', () => {
       // textMissingFallback: {
       //   de: 'deutsch',
       // },
+      textWithoutPlurals: {
+        en: 'english',
+      },
     };
 
     expect(texts satisfies Texts<Languages, Fallback, typeof texts>).toBeTruthy();
