@@ -37,7 +37,10 @@ export const translator = new Translator({
 Next you should define a `Dictionary` in your components.
 
 ```svelte
-<!-- You can define translations in a `module`-Block, as it is shared across instances of the same component -->
+<!--
+    You can define translations in a `module`-Block, as it is shared across instances of the
+    same component.
+-->
 <script lang="ts" module>
   import { translator } from '$lib/i18n';
 
@@ -52,14 +55,17 @@ Next you should define a `Dictionary` in your components.
   });
 </script>
 
-<!-- The keys and parameters are type-checked. If the key is not defined, the component will not compile. -->
+<!--
+    The keys and parameters are type-checked.
+    If the key is not defined, the component will not compile.
+-->
 <p>{t('myFirstTranslation')}</p>
 ```
 
 ### Language Detection
 
-Detecting the user's preferred language using `navigator.languages` or a previously selected language
-from the `localStorage`.
+Detecting the user's preferred language using `navigator.languages` or a previously selected
+language from the `localStorage`.
 
 Browser globals are not defined when using server-side rendering in SvelteKit.
 The provided strategies and hooks skip execution, when `navigator` or `localStorage` are missing.
@@ -84,7 +90,7 @@ You can use both to create a language selector.
 The `currentLanguage` is a rune and will automatically propagate changes to all components.
 
 ```svelte
-<script lang="ts">
+<script lang="ts" module>
   import { translator } from '$lib/i18n';
 </script>
 
@@ -100,7 +106,7 @@ The `currentLanguage` is a rune and will automatically propagate changes to all 
 Basic key-value mapping for static text.
 
 ```svelte
-<script lang="ts">
+<script lang="ts" module>
   import { translator } from '$lib/i18n';
 
   const { t } = translator.define({
@@ -119,7 +125,7 @@ Basic key-value mapping for static text.
 Using `Intl.PluralRules`[^1] logic to handle count-based text variations.
 
 ```svelte
-<script lang="ts">
+<script lang="ts" module>
   import { translator } from '$lib/i18n';
 
   const { p } = translator.define({
@@ -146,7 +152,7 @@ Instead of defining static structures you can also define functions, which retur
 Template literals can be used to interpolate text.
 
 ```svelte
-<script lang="ts">
+<script lang="ts" module>
   import { translator } from '$lib/i18n';
 
   const { t } = translator.define({
