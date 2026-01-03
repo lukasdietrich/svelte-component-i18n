@@ -1,12 +1,12 @@
-import { browser } from '$app/environment';
-
 export type LanguageStrategy<Languages extends string> = (
   supportedLanguages: Languages[]
 ) => Languages | undefined;
 
-export function fromNavigator<Languages extends string>(): LanguageStrategy<Languages> {
+export function fromNavigator<Languages extends string>(
+  navigator: typeof globalThis.navigator = globalThis.navigator
+): LanguageStrategy<Languages> {
   return (supportedLanguages: Languages[]): Languages | undefined => {
-    if (!browser) {
+    if (!navigator) {
       return;
     }
 
@@ -21,10 +21,11 @@ export function fromNavigator<Languages extends string>(): LanguageStrategy<Lang
 }
 
 export function fromLocalStorage<Languages extends string>(
-  key: string
+  key: string,
+  localStorage = globalThis.localStorage
 ): LanguageStrategy<Languages> {
   return (supportedLanguages: Languages[]): Languages | undefined => {
-    if (!browser) {
+    if (!localStorage) {
       return;
     }
 
@@ -42,9 +43,12 @@ export function fromLocalStorage<Languages extends string>(
 
 export type LanguageHook<Languages extends string> = (language: Languages) => unknown;
 
-export function toLocalStorage<Languages extends string>(key: string): LanguageHook<Languages> {
+export function toLocalStorage<Languages extends string>(
+  key: string,
+  localStorage = globalThis.localStorage
+): LanguageHook<Languages> {
   return (language: Languages) => {
-    if (!browser) {
+    if (!localStorage) {
       return;
     }
 
