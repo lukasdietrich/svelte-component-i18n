@@ -1,58 +1,140 @@
-# Svelte library
+# svelte-component-i18n
 
-Everything you need to build a Svelte library, powered by [`sv`](https://npmjs.com/package/sv).
+A lightweight internationalization library for Svelte.
+It acts as a thin wrapper around native browser APIs, prioritizing type safety and component-level
+translation management.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Core Philosophy
 
-## Creating a project
+* **Zero Dependencies:** Only Svelte is required as a peer dependency.
+* **Native-First:** Leverages `Intl.PluralRules` for locale-aware pluralization instead of custom logic.
+* **Colocation:** Translations are defined within the components that use them, keeping the context close to the UI.
+* **Template Literals:** Uses standard JavaScript template literals for interpolation.
 
-If you're seeing this, you've probably already done this step. Congrats!
+---
 
-```sh
-# create a new project in the current directory
-npx sv create
+## Features
 
-# create a new project in my-app
-npx sv create my-app
+* **Type Safety:** Designed to provide type hints for your translation keys and parameters.
+* **Reactivity:** Integrates with Svelte stores to update the UI immediately upon language changes.
+* **Small Footprint:** Does not bundle large translation files; you only load what your components need.
+
+---
+
+## Technical Overview
+
+The library maps input values to translation strings by using the browser's [`Intl`][^1] API to determine
+plural categories (e.g. `one`, `few`, `other`).
+
+---
+
+## Usage Examples
+
+The following examples are simplified. Ideally you construct one `Translator` and reuse it in every
+component, only defining translations there.
+
+### Language Detection
+
+Detecting the user's preferred language using `navigator.languages` or a previously selected language
+from the `localStorage`.
+
+```typescript
+import { fromLocalStorage, fromNavigator, toLocalStorage, Translator } from 'svelte-component-i18n';
+
+const localStorageKey = 'my-app-language';
+
+const translator = new Translator({
+    supportedLanguages: ['en', 'de'],
+    fallbackLanguage: 'en',
+    languageStrategies: [fromLocalStorage(localStorageKey), fromNavigator()],
+    languageHooks: [toLocalStorage(localStorageKey)],
+});
 ```
 
-## Developing
+### Language Selection
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Managing and updating the current active locale store.
 
-```sh
-npm run dev
+```svelte
+<script lang="ts">
+  import { Translator } from 'svelte-component-i18n';
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+  const translator = new Translator({
+    supportedLanguages: ['en', 'de'],
+    fallbackLanguage: 'en',
+  });
+</script>
+
+<select bind:value={translator.currentLanguage}>
+  {#each translator.supportedLanguages as language (language)}
+    <option value={language}>{language}</option>
+  {/each}
+</select>
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+### Simple Translations
 
-## Building
+Basic key-value mapping for static text.
 
-To build your library:
+```svelte
+<script lang="ts">
+import { translator } from '$lib/my-globally-defined-translator';
 
-```sh
-npm pack
+const { t } = translator.define({
+    simple: {
+        en: 'Simple',
+        de: 'Einfach',
+    },
+});
+</script>
+
+{t('simple')}
 ```
 
-To create a production version of your showcase app:
+### Pluralization
 
-```sh
-npm run build
+Using `Intl.PluralRules` logic to handle count-based text variations.
+
+```svelte
+<script lang="ts">
+import { translator } from '$lib/my-globally-defined-translator';
+
+const { p } = translator.define({
+    pluralized: {
+        en: {
+            one: 'One thing',
+            other: 'Many things',
+        },
+        de: {
+            one: 'Ein Ding',
+            other: 'Viele Dinge',
+        },
+    },
+});
+</script>
+
+{p('pluralized', 1)}
+{p('pluralized', 42)}
 ```
 
-You can preview the production build with `npm run preview`.
+### Interpolation
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Instead of defining static structures you can also define functions, which return the same structures.
+Template literals can be used to interpolate text.
 
-## Publishing
+```svelte
+<script lang="ts">
+import { translator } from '$lib/my-globally-defined-translator';
 
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
+const { t } = translator.define({
+    parameterized: (name: string) => ({
+        en: `Hello ${name}`,
+        de: `Hallo ${name}`,
+    }),
+});
+</script>
 
-To publish your library to [npm](https://www.npmjs.com):
-
-```sh
-npm publish
+{t('parameterized', 'Svelte')}
 ```
+
+[^1]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules
