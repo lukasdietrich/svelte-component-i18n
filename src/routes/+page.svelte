@@ -1,7 +1,14 @@
 <script lang="ts">
-  import { Translator } from '../lib/index.ts';
+  import { fromLocalStorage, fromNavigator, toLocalStorage, Translator } from '../lib/index.ts';
 
-  const translator = new Translator(['en', 'de'], 'en');
+  const localStorageKey = '__svelte_component_i18n_lang';
+
+  const translator = new Translator({
+    supportedLanguages: ['en', 'de'],
+    fallbackLanguage: 'en',
+    languageStrategies: [fromLocalStorage(localStorageKey), fromNavigator()],
+    languageHooks: [toLocalStorage(localStorageKey)],
+  });
 
   const { t, p } = translator.define({
     simple: {
@@ -28,7 +35,7 @@
 </script>
 
 <select bind:value={translator.currentLanguage}>
-  {#each translator.languages as language (language)}
+  {#each translator.supportedLanguages as language (language)}
     <option value={language}>{language}</option>
   {/each}
 </select>

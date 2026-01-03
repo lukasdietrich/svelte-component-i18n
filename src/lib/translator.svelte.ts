@@ -1,24 +1,50 @@
 import type { Locale } from './locale.ts';
 import { Dictionary, type Texts } from './dictionary.ts';
+import type { LanguageHook, LanguageStrategy } from './detect.ts';
 
 type MustStringUnion<T extends string> = string extends T ? never : T;
 
 export class Translator<Languages extends string, Fallback extends Languages> {
+  readonly supportedLanguages: Languages[];
+  readonly fallbackLanguage: Fallback;
+
   currentLanguage: Languages;
+
   private readonly locale: Locale<Languages, Fallback>;
 
-  constructor(
-    public readonly languages: MustStringUnion<Languages>[],
-    public readonly fallback: Fallback
-  ) {
-    checkSupportedLanguages(languages);
+  constructor({
+    supportedLanguages,
+    fallbackLanguage,
+    languageStrategies = [],
+    languageHooks = [],
+  }: {
+    supportedLanguages: MustStringUnion<Languages>[];
+    fallbackLanguage: Fallback;
+    languageStrategies?: LanguageStrategy<Languages>[];
+    languageHooks?: LanguageHook<Languages>[];
+  }) {
+    checkSupportedLanguages(supportedLanguages);
 
-    this.currentLanguage = $state(fallback);
+    this.supportedLanguages = supportedLanguages;
+    this.fallbackLanguage = fallbackLanguage;
+
+    const initialLanguage = determineInitialLanguage(
+      languageStrategies,
+      supportedLanguages,
+      fallbackLanguage
+    );
+    this.currentLanguage = $state(initialLanguage);
 
     this.locale = $derived({
       language: this.currentLanguage,
-      fallback: this.fallback,
+      fallback: this.fallbackLanguage,
       pluralRules: new Intl.PluralRules(this.currentLanguage),
+    });
+
+    $effect(() => {
+      for (const hook of languageHooks) {
+        hook(this.currentLanguage);
+      }
     });
   }
 
@@ -34,4 +60,19 @@ function checkSupportedLanguages(languages: string[]) {
   if (unsupportedLanguages.length > 0) {
     throw new Error(`Unsupported languages: ${unsupportedLanguages}`);
   }
+}
+
+function determineInitialLanguage<Languages extends string>(
+  strategies: LanguageStrategy<Languages>[],
+  languages: Languages[],
+  fallback: Languages
+): Languages {
+  for (const strategy of strategies) {
+    const language = strategy(languages);
+    if (language !== undefined) {
+      return language;
+    }
+  }
+
+  return fallback;
 }
