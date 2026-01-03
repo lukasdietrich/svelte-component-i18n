@@ -4,30 +4,6 @@ A lightweight internationalization library for Svelte.
 It acts as a thin wrapper around native browser APIs, prioritizing type safety and component-level
 translation management.
 
-## Core Philosophy
-
-* **Zero Dependencies:** Only Svelte is required as a peer dependency.
-* **Native-First:** Leverages `Intl.PluralRules` for locale-aware pluralization instead of custom logic.
-* **Colocation:** Translations are defined within the components that use them, keeping the context close to the UI.
-* **Template Literals:** Uses standard JavaScript template literals for interpolation.
-
----
-
-## Features
-
-* **Type Safety:** Designed to provide type hints for your translation keys and parameters.
-* **Reactivity:** Integrates with Svelte stores to update the UI immediately upon language changes.
-* **Small Footprint:** Does not bundle large translation files; you only load what your components need.
-
----
-
-## Technical Overview
-
-The library maps input values to translation strings by using the browser's `Intl`[^1] API to determine
-plural categories (e.g. `one`, `few`, `other`).
-
----
-
 ## Usage Examples
 
 The following examples are simplified. Ideally you construct one `Translator` and reuse it in every
