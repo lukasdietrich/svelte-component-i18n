@@ -1,3 +1,5 @@
+[![NPM Version](https://img.shields.io/npm/v/svelte-component-i18n)](https://www.npmjs.com/package/svelte-component-i18n)
+
 # svelte-component-i18n
 
 A lightweight internationalization library for Svelte.
