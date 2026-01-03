@@ -8,9 +8,10 @@ export class Translator<Languages extends string, Fallback extends Languages> {
   readonly supportedLanguages: Languages[];
   readonly fallbackLanguage: Fallback;
 
-  currentLanguage: Languages;
+  #currentLanguage: Languages;
 
   private readonly locale: Locale<Languages, Fallback>;
+  private readonly languageHooks: LanguageHook<Languages>[];
 
   constructor({
     supportedLanguages,
@@ -33,19 +34,27 @@ export class Translator<Languages extends string, Fallback extends Languages> {
       supportedLanguages,
       fallbackLanguage
     );
-    this.currentLanguage = $state(initialLanguage);
+    this.#currentLanguage = $state(initialLanguage);
 
     this.locale = $derived({
-      language: this.currentLanguage,
+      language: this.#currentLanguage,
       fallback: this.fallbackLanguage,
       pluralRules: new Intl.PluralRules(this.currentLanguage),
     });
 
-    $effect(() => {
-      for (const hook of languageHooks) {
-        hook(this.currentLanguage);
-      }
-    });
+    this.languageHooks = languageHooks;
+  }
+
+  get currentLanguage() {
+    return this.#currentLanguage;
+  }
+
+  set currentLanguage(language: Languages) {
+    this.#currentLanguage = language;
+
+    for (const hook of this.languageHooks) {
+      hook(this.currentLanguage);
+    }
   }
 
   define<T>(texts: Texts<Languages, Fallback, T>): Dictionary<Languages, Fallback, T> {
