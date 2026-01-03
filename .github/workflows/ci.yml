@@ -21,7 +21,7 @@ jobs:
         check-latest: true
         cache: 'npm'
     - run: npm ci
-    - run: npm run build --if-present
+    - run: npm run build
     - run: npm test
-    - run: npm check
-    - run: npm lint
+    - run: npm run check
+    - run: npm run lint
