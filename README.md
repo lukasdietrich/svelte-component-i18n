@@ -23,7 +23,7 @@ translation management.
 
 ## Technical Overview
 
-The library maps input values to translation strings by using the browser's [`Intl`][^1] API to determine
+The library maps input values to translation strings by using the browser's `Intl`[^1] API to determine
 plural categories (e.g. `one`, `few`, `other`).
 
 ---
