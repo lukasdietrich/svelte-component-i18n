@@ -3,7 +3,7 @@ export type LanguageStrategy<Languages extends string> = (
 ) => Languages | undefined;
 
 export function fromNavigator<Languages extends string>(
-  navigator: typeof globalThis.navigator = globalThis.navigator
+  navigator: Navigator = globalThis.navigator
 ): LanguageStrategy<Languages> {
   return (supportedLanguages: Languages[]): Languages | undefined => {
     if (!navigator) {
@@ -11,7 +11,7 @@ export function fromNavigator<Languages extends string>(
     }
 
     for (const navigatorLanguage of navigator.languages) {
-      const language = navigatorLanguage as Languages;
+      const language = stripOptionalBCP47SubTags(navigatorLanguage) as Languages;
 
       if (supportedLanguages.includes(language)) {
         return language;
@@ -20,9 +20,14 @@ export function fromNavigator<Languages extends string>(
   };
 }
 
+function stripOptionalBCP47SubTags(bcp47Tag: string): string {
+  const [language, _script, _region] = bcp47Tag.split('-');
+  return language;
+}
+
 export function fromLocalStorage<Languages extends string>(
   key: string,
-  localStorage = globalThis.localStorage
+  localStorage: Storage = globalThis.localStorage
 ): LanguageStrategy<Languages> {
   return (supportedLanguages: Languages[]): Languages | undefined => {
     if (!localStorage) {
@@ -45,7 +50,7 @@ export type LanguageHook<Languages extends string> = (language: Languages) => un
 
 export function toLocalStorage<Languages extends string>(
   key: string,
-  localStorage = globalThis.localStorage
+  localStorage: Storage = globalThis.localStorage
 ): LanguageHook<Languages> {
   return (language: Languages) => {
     if (!localStorage) {
