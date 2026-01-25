@@ -1,6 +1,6 @@
 {
   "name": "svelte-component-i18n",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "license": "BSD-3-Clause",
   "description": "Lightweight internationalization library for Svelte.",
   "author": "Lukas Dietrich <lukas@lukasdietrich.com>",
