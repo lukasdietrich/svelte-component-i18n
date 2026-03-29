@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.1",
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^10.0.1",
     "@sveltejs/adapter-auto": "^7.0.0",
     "@sveltejs/kit": "^2.55.0",
     "@sveltejs/package": "^2.5.7",
